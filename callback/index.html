@@ -27,13 +27,86 @@
       letter-spacing: -0.02em;
       margin: 0 0 0.75rem;
     }
-    p { margin: 0; color: #333; }
+    p { margin: 0 0 1rem; color: #333; }
+    label {
+      display: block;
+      font-size: 0.8125rem;
+      color: #666;
+      margin: 0 0 0.35rem;
+    }
+    textarea {
+      width: 100%;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9375rem;
+      line-height: 1.4;
+      color: #111;
+      background: #f6f6f6;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.6rem 0.7rem;
+      resize: none;
+      user-select: all;
+      -webkit-user-select: all;
+    }
+    .field { margin: 0 0 1rem; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Authorized</h1>
-    <p>This vehicle access grant completed. You can close this page.</p>
+    <h1 id="heading">Waiting</h1>
+    <div id="content"></div>
   </main>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var heading = document.getElementById("heading");
+      var content = document.getElementById("content");
+
+      function addParagraph(text) {
+        var el = document.createElement("p");
+        el.textContent = text;
+        content.appendChild(el);
+      }
+
+      function addField(labelText, value) {
+        var wrap = document.createElement("div");
+        wrap.className = "field";
+        var label = document.createElement("label");
+        label.textContent = labelText;
+        var box = document.createElement("textarea");
+        box.readOnly = true;
+        box.rows = 3;
+        box.value = value;
+        box.setAttribute("spellcheck", "false");
+        box.addEventListener("focus", function () { box.select(); });
+        wrap.appendChild(label);
+        wrap.appendChild(box);
+        content.appendChild(wrap);
+      }
+
+      var error = params.get("error");
+      var code = params.get("code");
+
+      if (error) {
+        heading.textContent = "Authorization failed";
+        addParagraph(error);
+        var description = params.get("error_description");
+        if (description) addParagraph(description);
+        return;
+      }
+
+      if (code) {
+        heading.textContent = "Authorized";
+        addField("Authorization code", code);
+        var state = params.get("state");
+        if (state) addField("State", state);
+        addParagraph("This code is single-use; you can close the page after it is copied.");
+        return;
+      }
+
+      heading.textContent = "Waiting";
+      addParagraph("This page finishes Tesla authorization. No code yet.");
+    })();
+  </script>
 </body>
 </html>
