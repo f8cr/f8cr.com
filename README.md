@@ -1,4 +1,4 @@
-Public origin for Autumn Dispatch on korrybusch.com.
+Public origin for Batch Address Drop on korrybusch.com.
 
 Hosts the Tesla Fleet public key and privacy policy. No private keys.
 
